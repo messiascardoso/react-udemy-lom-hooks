@@ -1,42 +1,36 @@
 import './App.css';
-import { useEffect, useState } from 'react';
+import P from 'prop-types';
+import React, { useCallback, useState } from 'react';
 
-const eventFn = () => {
-  console.log('h1 clickado');
+const Button = React.memo(function Button({ incrementButton }) {
+  console.log('Filho renderizou');
+  return <button onClick={() => incrementButton(10)}>+</button>;
+});
+
+Button.propTypes = {
+  incrementButton: P.func,
 };
 
 function App() {
   const [counter, setCounter] = useState(0);
-  const [counter2, setCounter2] = useState(0);
 
-  //Executa toda vez que o componente é atualizado
-  // useEffect(() => {
-  //   console.log('ComponentDidUpdate');
-  // });
+  //Todo a vez que o componente e atualizado esta funcão é criada novamente.
+  // Roda tudo que esta dentro do componente
 
-  //Executa somente 1x
-  useEffect(() => {
-    console.log('ComponentDidMount');
-    document.querySelector('h1')?.addEventListener('click', eventFn);
-    //ComponentWillUmount => limpa
-    return () =>
-      document.querySelector('h1')?.removeEventListener('click', eventFn);
+  // Usar o useCallback somente se a function for pesada.
+
+  const incrementCounter = useCallback((num) => {
+    //console.log('incrementCounter');
+    setCounter((c) => c + num);
   }, []);
 
-  //Com dependencia - executa toda vez que a dependencia é alterada
-  useEffect(() => {
-    console.log('C1: ', counter, 'C2: ', counter2);
-    //setCounter(counter + 1);
-  }, [counter, counter2]);
+  console.log('Pai renderizou');
 
   return (
     <div className="App">
       <p>Teste 5</p>
-      <h1>
-        C1:{counter} C2: {counter2}
-      </h1>
-      <button onClick={() => setCounter(counter + 1)}>+</button>
-      <button onClick={() => setCounter2(counter2 + 1)}>+(2)</button>
+      <h1>C1:{counter}</h1>
+      <Button incrementButton={incrementCounter}>+</Button>
     </div>
   );
 }
