@@ -1,12 +1,12 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import './App.css';
 import P from 'prop-types';
 
-const Post = ({ post }) => {
+const Post = ({ post, handleClick }) => {
   console.log('filho renderizou');
   return (
     <div key={post.id} className="post">
-      <h1>{post.title}</h1>
+      <h1 onClick={() => handleClick(post.title)}>{post.title}</h1>
       <p>{post.body}</p>
     </div>
   );
@@ -18,26 +18,44 @@ Post.propTypes = {
     title: P.string,
     body: P.string,
   }),
+  handleClick: P.func,
 };
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [value, setValue] = useState('');
+  const inputRef = useRef(null);
+  const contadorRef = useRef(null);
   console.log('Pai renderizou');
 
   //Component did mount
   useEffect(() => {
-    setTimeout(() => {
-      fetch('https://jsonplaceholder.typicode.com/posts')
-        .then((result) => result.json())
-        .then((result2) => setPosts(result2));
-    }, 5000);
+    fetch('https://jsonplaceholder.typicode.com/posts')
+      .then((result) => result.json())
+      .then((result2) => setPosts(result2));
   }, []);
+
+  useEffect(() => {
+    console.log(inputRef.current);
+    inputRef.current.focus();
+  }, [value]);
+
+  useEffect(() => {
+    // Quando for alterado o valor de useRef()
+    // não causa uma nova reinderizacao
+    contadorRef.current++;
+  });
+
+  const handleOnclick = (value) => {
+    setValue(value);
+  };
 
   return (
     <div className="App">
+      <h6>Renderizou: {contadorRef.current}x</h6>
       <p>
         <input
+          ref={inputRef}
           type="search"
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -47,7 +65,9 @@ function App() {
       {useMemo(() => {
         return (
           posts.length > 0 &&
-          posts.map((post) => <Post key={post.id} post={post} />)
+          posts.map((post) => (
+            <Post key={post.id} post={post} handleClick={handleOnclick} />
+          ))
         );
       }, [posts])}
 
