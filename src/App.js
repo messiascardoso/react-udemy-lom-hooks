@@ -80,3 +80,20 @@ function App() {
 }
 
 export default App;
+
+/**
+ * State como funciona
+ * ```jsx
+const context = {
+    contextState: {
+        title: 'Olá',
+        body: 'body conteudo'
+    },
+    setState: function(param) {
+        this.contextState = param
+    }
+}
+```
+context.setState({...context.contextState, title: 'Alterado'})
+
+ */
